@@ -128,21 +128,21 @@ function runit(){
 	       document.getElementById('outpt').value+=String.fromCharCode(c);
 	   }});
 	   cpu._debuggerCallback=function(){
-	     console.log(cpu._regMem);
+//	     console.log(cpu._regMem);
 	      cpu.doNext();
 	   }
        TINY.input=document.getElementById('srccd').value||"";
        TINY.Compile();
-	   document.getElementById('dbgwin').value+=TINY.output;
+	  // document.getElementById('dbgwin').value+=TINY.output;
 	   var code = TINY.bitcode;
 	   document.getElementById("dbgwin").value+=TINY.asm;
-	   document.getElementById("dbgwin").value+=JSON.stringify(code);
+	 //  document.getElementById("dbgwin").value+=JSON.stringify(code);
 	   
 	    loadAndRun(code,cpu);
 	   
 	   
 	  }catch(e){
-	     document.getElementById('dbgwin').value+=TINY.output;
+	 //    document.getElementById('dbgwin').value+=TINY.output;
 	     document.getElementById("dbgwin").value+=e;
 	  }
 
