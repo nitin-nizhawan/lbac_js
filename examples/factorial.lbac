@@ -1,0 +1,47 @@
+PROGRAM;
+{ prints a number }
+PROCEDURE PRINTINT(num)
+var tmp;
+var size;
+BEGIN
+   tmp=0;
+   size=0;
+{ Reverse the number }
+   WHILE(num)
+       tmp = tmp*10 + ( num - 10*(num/10) );
+       size=size+1;
+       num=num/10;
+   ENDWHILE;
+ 
+{ print the number }
+   IF (size)
+       { now print the digits }
+       WHILE(size)
+           WRITE(48 + (tmp - 10*(tmp/10)));
+           size = size-1;
+           tmp=tmp/10;
+       ENDWHILE;
+   ELSE
+      { print a zero }
+      WRITE(48);
+   ENDIF;
+   
+END
+
+{ main routine }
+PROCEDURE MAIN()
+var N;
+var f;
+var cnt;
+BEGIN
+  N=5; { term to print }
+  cnt=0;
+  f=1;
+  PRINTINT(f);WRITE(10);
+  WHILE(N-cnt)
+      f = f*(cnt+1);
+      PRINTINT(f);WRITE(10);
+      cnt=cnt+1;
+  ENDWHILE;
+END
+
