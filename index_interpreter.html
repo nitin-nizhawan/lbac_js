@@ -1,0 +1,76 @@
+<html>
+<head>
+<title>LBAC</title>
+<style>
+body{
+  margin:0px;
+  padding:0px;
+  background-color:blue;
+  font-family:'Courier New';
+}
+textarea{
+  background-color:black;
+  color:white;
+  border:0px;
+}
+label {
+  font-weight:bold;
+  color:white;
+}
+</style>
+<script src="js/interpreter.js" ></script>
+<script>
+   function runit(){
+     try{
+	   document.getElementById("dbgwin").value="";
+	   document.getElementById('outpt').value="";
+       INTER.source=document.getElementById('srccd').value||"";
+	   INTER.input = document.getElementById('inpt').value||"";
+       INTER.Main();
+	   document.getElementById('outpt').value=INTER.output;
+	  }catch(e){
+	     document.getElementById('outpt').value=INTER.output;
+	     document.getElementById("dbgwin").value=e;
+	  }
+   }
+</script>
+</head>
+<body >
+<h2 style="background-color:blue;border:1px white solid;padding:0px;margin:0px;color:white;">Let's Build a compiler</h2>
+<br/>
+<table>
+<tr>
+<td>
+<label>Source:</label>
+</td><td><label>Output:</label></td>
+</tr>
+<tr>
+<td>
+<textarea style="display:block;" rows="20" cols="60" id="srccd" >
+</textarea>
+</td>
+<td>
+
+<textarea rows="20" cols="60" id="outpt" ></textarea>
+</td></tr>
+<tr>
+<tr>
+<td><label>Input:</label></td><td><label>Compiler Log:</label>	</td>
+</tr>
+<td>
+
+<textarea rows="10" cols="60" id="inpt" ></textarea>
+</td>
+<td>
+
+<textarea rows="10" cols="60" id="dbgwin" ></textarea>
+</td>
+</tr>
+<tr>
+<td>
+<input type="button" value="Execute" onclick="runit()" />
+</td>
+</tr>
+</table>
+</body>
+</html>
