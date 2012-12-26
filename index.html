@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>cool2js</title>
+<title>LBAC</title>
 <style>
 body{
   margin:0px;
@@ -18,9 +18,8 @@ label {
   color:white;
 }
 </style>
-<script src="js/cool.js" ></script>
-<script src="js/datastruct.js" ></script>
-<script src="js/semant.js" ></script>
+<script src="js/cpu.js" ></script>
+<script src="js/tiny.js" ></script>
 <script>
 function getXHR(){
       if (window.XMLHttpRequest)
@@ -46,7 +45,7 @@ function doxhr(url,cb){
 }
 function getSourceCode(){
      var select_v = document.getElementById('srcselect');
-	 return "examples/"+select_v.value+".cl";
+	 return "examples/"+select_v.value+".lbac";
 }
 function getSourceInput(){
      var select_v = document.getElementById('srcselect');
@@ -65,56 +64,99 @@ function loadSource(){
    doxhr(getSourceCode(),processResponse);  
    
 }
+
+ function loadAndRun(code,cpu){
+       var defs={};
+	   var codeaddr=0;
+	   var codebytes=[];
+	   for(var i=0;i<code.length;){
+	       var obj = code[i];
+	       if(typeof(obj)=="number"){
+		       i+=cpu.getInstrSize(obj);
+			   codeaddr+=cpu.getInstrSize(obj);
+		   } else if("gdef" in obj){
+		       defs[obj.gdef]=codeaddr;
+			   i++;
+		   } else if("dwdef" in obj){
+		       defs[obj.dwdef]=codeaddr;
+		       i+=5;
+		       codeaddr+=4;
+		   } else {
+		       throw new Error("Undefined object in code"+obj);
+		   }
+	   }
+	   for(var i=0;i<code.length;){
+	       var obj = code[i];
+	       if(typeof(obj)=="number"){
+		       var size= cpu.getInstrSize(obj);
+			   for(var k=0;k<size;){
+			       var o = code[i+k];
+				   if(typeof(o)=="number"){
+				       codebytes.push(o);
+					   k++;
+				   } else if("ref" in o){
+				       var addr = defs[o.ref];
+					   codebytes.push(addr&0xFF,(addr>>>8)&0xFF,(addr>>>16)&0xFF,(addr>>>24)&0xFF);
+					   k+=4;
+				   } else {
+				       throw new Error("Unexpected obj "+o);
+				   }
+			   }
+		       i+=size;
+		   } else if("gdef" in obj){
+		       i++;
+		   } else if("dwdef" in obj){
+		       codebytes.push(code[i+1],code[i+2],code[i+3],code[i+4]);
+		       i+=5;
+		   } else {
+		       throw Error("Undefined object in code"+obj);
+		   }
+	   }
+	   console.log(code);
+	   console.log(codebytes);
+	   for(var i=0;i<codebytes.length;i++){
+	        cpu._mem[i]=codebytes[i];
+	   }
+	   cpu.start()
+   }
 function runit(){
-   tptr=0;
-  var srccddiv = document.getElementById("srccd");
-   var inptdiv = document.getElementById("inpt");
-   var outptdiv = document.getElementById("outpt");
-   var dbgv = document.getElementById("dbgwin");
-    outptdiv.value="";
-	dbgv.value="";
-	//inptdiv.value="";
-	var parser = new cool.Parser();
-	parser.yy.ds = ds;
-	parser.yy.sa = sa;
-	parser.yy.debug = function(v){
-	  dbgv.style.color='white';
-	  dbgv.value+=v;
-	};
-	var strs = inptdiv.value.split(" ");
-	var next=0;
-	parser.yy.printstr=function(str){
-	    outptdiv.value+=str;
-	}
-	parser.yy.readstr=function(){
-	    return strs[next++];
-	}
-	try{
-	dbgv.style.color='white';
-	dbgv.value+="Starting....\n";
-	parser.parse(srccddiv.value);
-	} catch(e){
-	    dbgv.style.color='red';
-	    dbgv.value=e.message;
-		throw new Error("Terminated Abnormally");
-	}
-	dbgv.style.color='white';
-	dbgv.value+="\nExecution completed successfully\n";
-	dbgv.scrollTop = dbgv.scrollHeight;
+ try{
+	   document.getElementById("dbgwin").value="";
+	   document.getElementById('outpt').value="";
+	   
+	   var cpu = new CPU().init(64*1024,{},{write:function(c){
+	       document.getElementById('outpt').value+=String.fromCharCode(c);
+	   }});
+	   cpu._debuggerCallback=function(){
+	     console.log(cpu._regMem);
+	      cpu.doNext();
+	   }
+       TINY.input=document.getElementById('srccd').value||"";
+       TINY.Compile();
+	   document.getElementById('dbgwin').value+=TINY.output;
+	   var code = TINY.bitcode;
+	   document.getElementById("dbgwin").value+=TINY.asm;
+	   document.getElementById("dbgwin").value+=JSON.stringify(code);
+	   
+	    loadAndRun(code,cpu);
+	   
+	   
+	  }catch(e){
+	     document.getElementById('dbgwin').value+=TINY.output;
+	     document.getElementById("dbgwin").value+=e;
+	  }
 
 }
 </script>
 </head>
 <body >
-<h2 style="background-color:blue;border:1px white solid;padding:0px;margin:0px;color:white;">COOL2JS compiler</h2>
+<h2 style="background-color:blue;border:1px white solid;padding:0px;margin:0px;color:white;">Let's build a compiler</h2>
 <br/>
 <table>
 <tr>
 <td>
 <label>Source:</label><select id="srcselect" onchange="loadSource()">
 <option value="hello_world">Hello World</option>
-<option value="cool">Cool</option>
-<option value="palindrome">Palindrome</option>
 <option value="random">Random</option>
 <option value="fibonacci">Fibonacci Sequence</option>
 <option value="factorial">Factorial</option>
