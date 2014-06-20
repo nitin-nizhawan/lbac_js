@@ -127,6 +127,7 @@ function runit(){
 	   var cpu = new CPU().init(64*1024,{},{write:function(c){
 	       document.getElementById('outpt').value+=String.fromCharCode(c);
 	   }});
+           cpu.iterative=true;
 	   cpu._debuggerCallback=function(){
 //	     console.log(cpu._regMem);
 	      cpu.doNext();

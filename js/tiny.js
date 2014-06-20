@@ -1,3 +1,32 @@
+/********
+  STACK FRAME DESIGN 
+  Following is a description of 
+  stack frame design used by this compiler
+
+
+
+  last local param-> .........
+ 
+
+  local param 2 ->   .........   1968
+  local param 1 ->   .........   1972
+------------------------------------pushed $ra and $fp, 
+                                    also add 4*(numlocalparam) to 
+                                    stack pointer to allocate space 
+                                    for local params on stack
+  frame pointer      .........   1976
+  return address ->  .........   1980    
+------------------------------------------at the function entry point
+  lastParam(Base)->  .........   1984
+  .  .  .            .  . .
+  .  .  .            .  . .
+  3rd Param   ->     ---------   1992
+  2nd Param   ->     ----------  1996          
+  1st Param   ->     ----------  2000 (Address in decimal)
+                     ----------
+                     ----------
+bottom of stack ->   ----------
+***********/
 var TINY={
     input:"",
 	output:"",
@@ -215,7 +244,7 @@ var TINY={
     //Code generation function	
 	LoadParam:function(N){
 	    var Offset;
-		Offset = 8+4*(this.Base-N);
+		   Offset = 8+4*(this.Base-N);
 		this.Emit('MOVE ');
 		this.WriteLn(Offset+"(A6),D0");
 		this.printCode("ldi_dw","$b",Offset);
@@ -224,7 +253,7 @@ var TINY={
 	},
 	StoreParam:function(N){
 	    var Offset;
-		Offset = 8+4*(this.Base-N);
+		    Offset = 8+4*(this.Base-N);
 		this.Emit("MOVE D0,");
 		this.WriteLn(Offset+"(A6)");
 		
@@ -342,10 +371,12 @@ var TINY={
 		this.printCode("push_dw","$ra");
 		this.printCode("push_dw","$fp");
 		this.printCode("mv","$fp","$sp"); // establish new framepointer
+                this.printCode("ldi_dw","$t0",-4*k);
+                this.printCode("add","$sp","$t0"); // allocate space for local variables
 	},
 	ProcEpilog:function(){
 	    this.EmitLn("UNLK A6");
-		
+	        this.printCode("mv","$sp","$fp");	
 		this.printCode("pop_dw","$fp");
 		this.printCode("pop_dw","$ra");
 		this.Return();
@@ -718,7 +749,7 @@ var TINY={
 			}
 		this.MatchString(")");
 		this.Base = this.NumParams;
-		this.NumParams = this.NumParams+4;
+		this.NumParams = this.NumParams+2;
 	},
 	LocDecl:function(Name){
 	    this.Scan();

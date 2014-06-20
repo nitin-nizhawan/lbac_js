@@ -1,0 +1,63 @@
+PROGRAM;
+{ prints a number }
+PROCEDURE PRINTINT(num)
+var tmp;
+var size;
+BEGIN
+   tmp=0;
+   size=0;
+{ Reverse the number }
+   WHILE(num)
+       tmp = tmp*10 + ( num - 10*(num/10) );
+       size=size+1;
+       num=num/10;
+   ENDWHILE;
+ 
+{ print the number }
+   IF (size)
+       { now print the digits }
+       WHILE(size)
+           WRITE(48 + (tmp - 10*(tmp/10)));
+           size = size-1;
+           tmp=tmp/10;
+       ENDWHILE;
+   ELSE
+      { print a zero }
+      WRITE(48);
+   ENDIF;
+   
+END
+PROCEDURE RAND(n,seed)
+var i;
+var t;
+var m;
+BEGIN
+i=0;
+t = seed;
+m = 991*997;
+WHILE(n-i)
+  seed = seed*seed;
+  seed = seed - (seed/m)*m;
+  PRINTINT(seed);
+  WRITE(10);
+  i = i +1;
+ENDWHILE;
+  
+END
+{ main routine }
+PROCEDURE MAIN()
+var p5;
+var p0;
+var p1;
+var p2;
+var m;
+var t;
+var seed;
+var N;
+BEGIN
+  N=15;
+  seed = 23;
+  RAND(N,seed);
+END
+
+
