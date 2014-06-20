@@ -107,6 +107,7 @@ CPU.InstructionSet={
 })();
 CPU.prototype={
      init:function(memSize,inStr,outStr){
+             this.iterative = false;
 	     this._instrMap={};
 		 this._inStream  = inStr;
 		 this._outStream = outStr;
@@ -201,7 +202,13 @@ CPU.prototype={
 	     return CPU.InstructionSet.Instructions[CPU.InstructionSet.CodeToName[instr]].size;
 	 },
 	 start:function(){
-	    this._next_instr();
+         if(!this.iterative){
+          	    this._next_instr();
+         } else {
+		 while(!this._halted){
+			 this.doNext();
+		 }
+          }
 	 },
 	 writeMem:function(addr,word){
 	     this._mem[addr]=word;
@@ -232,7 +239,9 @@ CPU.prototype={
 	    this._decodeInstr(this._readInstr()).call(this,this);
 	},
     _next_instr:function(){
-	    (this._debuggerCallback||this.doNext).call(this);
+       if(!this.iterative){
+ 	    (this._debuggerCallback||this.doNext).call(this);
+       }
     },
 	_readInstr:function(){
 	    return this._mem[this._pc()];
