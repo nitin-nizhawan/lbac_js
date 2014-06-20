@@ -85,13 +85,14 @@ label {
 	       document.getElementById('outpt').value+=String.fromCharCode(c);
 	   }});
            cpu.iterative=true;
+           
 	   cpu._debuggerCallback=function(){
 	     console.log(cpu._regMem);
 	      cpu.doNext();
 	   }
        TINY.input=document.getElementById('srccd').value||"";
        TINY.Compile();
-	   document.getElementById('dbgwin').value+=TINY.output;
+	  // document.getElementById('dbgwin').value+=TINY.output;
 	   var code = TINY.bitcode;
 	   document.getElementById("dbgwin").value+=TINY.asm;
 	   document.getElementById("dbgwin").value+=JSON.stringify(code);
@@ -120,22 +121,65 @@ label {
 <td>
 <textarea style="display:block;" rows="20" cols="60" id="srccd" >
 PROGRAM;
+{ prints a number }
 PROCEDURE PRINTINT(num)
 var tmp;
+var size;
 BEGIN
    tmp=0;
+   size=0;
+{ Reverse the number }
    WHILE(num)
-    tmp=10*tmp + (num-10*(num/10));
-    num=num/10;
+       tmp = tmp*10 + ( num - 10*(num/10) );
+       size=size+1;
+       num=num/10;
    ENDWHILE;
-   WHILE(tmp)
-   WRITE(48+(tmp-(tmp/10)*10));
-   tmp=tmp/10;
-   ENDWHILE;
+ 
+{ print the number }
+   IF (size)
+       { now print the digits }
+       WHILE(size)
+           WRITE(48 + (tmp - 10*(tmp/10)));
+           size = size-1;
+           tmp=tmp/10;
+       ENDWHILE;
+   ELSE
+      { print a zero }
+      WRITE(48);
+   ENDIF;
+   
 END
-PROCEDURE MAIN()
+PROCEDURE RAND(n,seed)
+var i;
+var t;
+var m;
 BEGIN
-PRINTINT();
+i=0;
+t = seed;
+m = 991*997;
+WHILE(n-i)
+  seed = seed*seed;
+  seed = seed - (seed/m)*m;
+  PRINTINT(seed);
+  WRITE(10);
+  i = i +1;
+ENDWHILE;
+  
+END
+{ main routine }
+PROCEDURE MAIN()
+var p5;
+var p0;
+var p1;
+var p2;
+var m;
+var t;
+var seed;
+var N;
+BEGIN
+  N=15;
+  seed = 23;
+  RAND(N,seed);
 END
 
 </textarea>

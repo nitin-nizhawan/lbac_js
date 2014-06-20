@@ -183,6 +183,15 @@ CPU.prototype={
 		 this._writeUByte(addr+2,num>>>16);
 		 this._writeUByte(addr+3,num>>>24);
 	 },
+	 _readInt32:function(addr){
+	     var r=0;
+		 r=this._readUByte(addr);
+		 r|=this._readUByte(addr+1)<<8;
+		 r|=this._readUByte(addr+2)<<16;
+		 r|=this._readUByte(addr+3)<<24;
+		 return r; 
+	 },
+
 	 _readUInt32:function(addr){
 	     var r=0;
 		 r=this._readUByte(addr);
@@ -270,7 +279,7 @@ CPU.prototype={
 	},
 	_ldi_dw:function(){
 	    var pc=this._regMem[this._regs['$pc']];
-		this._regMem[this._mem[pc+1]]=this._readUInt32(pc+2);
+		this._regMem[this._mem[pc+1]]=this._readInt32(pc+2);
 	    this._incPC(this._instrMap[this._mem[pc]][1]);
 		this._next_instr();
 	},
